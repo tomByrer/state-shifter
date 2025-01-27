@@ -1,0 +1,11 @@
+{
+  "name": "state-shifter",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "alien-signals": "0.6.0",
+    "bun": "^1.2.0"
+  }
+}
