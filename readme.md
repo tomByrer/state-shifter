@@ -30,10 +30,10 @@ export const states ={
     id: 'firepit',
   },
   // 2nd state is inital / default '1st state'
-	empty: {
+  empty: {
     fuel: 'standby',
   },
-	standby: {
+  standby: {
     empty: 'empty',
     ignite: 'burning',
   },
@@ -84,12 +84,12 @@ export const states ={
     id: 'firepit',
   },
   // 2nd state is inital / default '1st state'
-	empty: {
+  empty: {
     fuel: ()=>{
       fuel()
       return 'standby' // return a new state if you want
     },
-	standby: {
+  standby: {
     empty: ()=>{
       data.set('fire pile', 0)
       return 'empty'
@@ -117,7 +117,7 @@ export const states ={
     dry: 'empty',
   },
 }
-``
+```
 
 
 ## Usage
