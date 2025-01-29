@@ -13,7 +13,7 @@ export function machineSequence(machine, data, sequence=[]){
   const len = sequence.length
   for (let i=0; i<len; i++) {
     console.log(i, 'trigger:', sequence[i])
-    const res = machine.trigger(sequence[i])
+    machine.trigger(sequence[i])
     console.log(i,
       'state:', data.get(machine.stateId), '\n',
     )
