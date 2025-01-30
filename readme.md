@@ -20,93 +20,91 @@ state-shifter seeks to make FSMs easy to learn, fun to build, while maximizing J
 <tbody>
 <tr>
 <td>
-```js
-switch (data.get('state')) {
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto"><pre><span class="pl-k">switch</span> <span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">get</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
 
-  case 'setting':
-    if (event === 'start') {
-      data.set('state', 'running')
-    }
-    break;
+  <span class="pl-k">case</span> <span class="pl-s">'setting'</span>:
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'start'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
 
-  case 'running':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'expire') {
-      data.set('state', 'alarm')
-    } else if (event === 'pause') {
-      data.set('state', 'paused')
-    } else if (event === 'reset') {
-      data.set('state', 'standby')
-    }
-    break;
+  <span class="pl-k">case</span> <span class="pl-s">'running'</span>:
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'expire'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'alarm'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'pause'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'paused'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'reset'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'standby'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
 
-  case 'paused':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'pause') {
-      data.set('state', 'paused') // Remain in paused state
-    } else if (event === 'resume') {
-      data.set('state', 'running')
-    }
-    break;
+  <span class="pl-k">case</span> <span class="pl-s">'paused'</span>:
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'pause'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'paused'</span><span class="pl-kos">)</span> <span class="pl-c">// Remain in paused state</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'resume'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
 
-  case 'alarm':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'stop') {
-      data.set('state', 'standby')
-    }
-    break;
+  <span class="pl-k">case</span> <span class="pl-s">'alarm'</span>:
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'stop'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'standby'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
 
-  case 'standby':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'start') {
-      data.set('state', 'running')
-    }
-    break;
+  <span class="pl-k">case</span> <span class="pl-s">'standby'</span>:
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'start'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
 
-  default:
-    data.set('state', 'setting')
-    break;
-}
-```
+  <span class="pl-k">default</span>:
+    <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
+    <span class="pl-k">break</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
 </td>
 <td>
-```js
-const states ={
-  _: {
-    id: 'countdown-timer',
-  },
-  idle: {  // 1st screen, no timer set
-    set: 'setting',
-  },
-  setting: { // entering time value
-    delete: 'idle',
-    start: 'running', // completed  setting timer time
-  },
-  running: {
-    delete: 'idle',
-    expire: 'alarm', // countdown reached 0
-    pause: 'paused', // stop countdown, current value is on hold
-    reset: 'standby', // stop countdown, return to after the time is set
-  },
-  paused: {
-    delete: 'idle',
-    reset: 'standby',
-    resume: 'running',
-  },
-  alarm: {
-    delete: 'idle',
-    stop: 'standby',
-  },
-  standby: { // timer reset, awaiting to start
-    delete: 'idle',
-    start: 'running',
-  },
-}
-```
+
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto"><pre><span class="pl-k">const</span> <span class="pl-s1">states</span> <span class="pl-c1">=</span><span class="pl-kos">{</span>
+  <span class="pl-c1">_</span>: <span class="pl-kos">{</span>
+    <span class="pl-c1">id</span>: <span class="pl-s">'countdown-timer'</span><span class="pl-kos">,</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">idle</span>: <span class="pl-kos">{</span>  <span class="pl-c">// 1st screen, no timer set</span>
+    <span class="pl-c1">set</span>: <span class="pl-s">'setting'</span><span class="pl-kos">,</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">setting</span>: <span class="pl-kos">{</span> <span class="pl-c">// entering time value</span>
+    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">start</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span> <span class="pl-c">// completed  setting timer time</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">running</span>: <span class="pl-kos">{</span>
+    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">expire</span>: <span class="pl-s">'alarm'</span><span class="pl-kos">,</span> <span class="pl-c">// countdown reached 0</span>
+    <span class="pl-c1">pause</span>: <span class="pl-s">'paused'</span><span class="pl-kos">,</span> <span class="pl-c">// stop countdown, current value is on hold</span>
+    <span class="pl-c1">reset</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span> <span class="pl-c">// stop countdown, return to after the time is set</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">paused</span>: <span class="pl-kos">{</span>
+    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">reset</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">resume</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">alarm</span>: <span class="pl-kos">{</span>
+    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">stop</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  <span class="pl-c1">standby</span>: <span class="pl-kos">{</span> <span class="pl-c">// timer reset, awaiting to start</span>
+    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">start</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span></pre></div>
+
 </td>
 </tr>
 </tbody>
