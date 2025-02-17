@@ -1,6 +1,6 @@
 {
   "name": "simple-state-shifter",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "simple-state-shifter.js",
   "scripts": {
     "build": "echo Building package-a"

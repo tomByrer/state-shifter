@@ -11,261 +11,26 @@ state-shifter seeks to make FSMs easy to learn, fun to build, while maximizing J
 
 ## Example
 
-<thead>
-<tr>
-<th>plain js</th>
-<th>state-shifter</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<div class="highlight highlight-source-js notranslate position-relative overflow-auto"><pre><span class="pl-k">switch</span> <span class="pl-kos">(</span><span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">get</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+<details>
+<summary>Click to open background for this plain-js / `simple-state-shifter` comparison:</summary>
+A client wants you to build a 'countdown timer' (sometimes found as Pomodoro timer).  He wants it to have the following modes:  
 
-  <span class="pl-k">case</span> <span class="pl-s">'setting'</span>:
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'start'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
+- setting (enter timer length)
+- running (time is counting down)
+- paused (temporary pause)
+- alarm (time expired)
+- standby (timer is reset to start)
 
-  <span class="pl-k">case</span> <span class="pl-s">'running'</span>:
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'expire'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'alarm'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'pause'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'paused'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'reset'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'standby'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
+Not all of these modes are to be accessible to each other; only a few triggers will transition to another mode (AKA 'state').  So you produce this [lovely diagram](https://www.mermaidchart.com/play#pako:eNp9UDFuwzAM_ArhsYA-wCFTxk5Z6wysxdhCbcqQaCRB0L_Hoh3AaOBOIu94dyIfVRM9V1g552ppolxCi7UAaMcDI1xi4qwF6GP8QehI_DHRVQyie5wUwVObuBazyErKxzAjNJQZHxI3GqLA56n0Xx9ncO4AmVWDtAVaS4PTJFJqhNkoWfAL2qjQc8_Kf1nqKQ3ItzGkN26kKbNHe95cdd7q-47zqmyRy_BO4pb8R7gGFG4aTGjf2zHdcKtn1jjadZZ-R7dlX4nr5arfJxGwpRE):
 
-  <span class="pl-k">case</span> <span class="pl-s">'paused'</span>:
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'pause'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'paused'</span><span class="pl-kos">)</span> <span class="pl-c">// Remain in paused state</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'resume'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
+![flowchart of countdown timer](./docs/countdown-timer-diagram.avif)
 
-  <span class="pl-k">case</span> <span class="pl-s">'alarm'</span>:
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'stop'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'standby'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
+Your client becomes dizzy trying to read your flowchart, so you promise him that you'll return with a quick program to demo the state transitions.  Unfortunately, you also become dizzy from all nest of `switch case if else` statements that you had to type in to get it working.  Fortunately, a friend told you about 'simple-state-shifter'.  Refactoring, you're amazed that typing in the core transition->state logic was easy & fun.  Even your client understands it!
+</details>
 
-  <span class="pl-k">case</span> <span class="pl-s">'standby'</span>:
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">event</span> <span class="pl-c1">===</span> <span class="pl-s">'start'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-      <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'running'</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
+![comparison of plain JavaScript code (47 lines) versus simple-state-shifter (25 lines of code)](./docs/js-vs-simple-state-shifter.avif)
 
-  <span class="pl-k">default</span>:
-    <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-en">set</span><span class="pl-kos">(</span><span class="pl-s">'state'</span><span class="pl-kos">,</span> <span class="pl-s">'setting'</span><span class="pl-kos">)</span>
-    <span class="pl-k">break</span><span class="pl-kos">;</span>
-<span class="pl-kos">}</span></pre></div>
-</td>
-<td>
-
-<div class="highlight highlight-source-js notranslate position-relative overflow-auto"><pre><span class="pl-k">const</span> <span class="pl-s1">states</span> <span class="pl-c1">=</span><span class="pl-kos">{</span>
-  <span class="pl-c1">_</span>: <span class="pl-kos">{</span>
-    <span class="pl-c1">id</span>: <span class="pl-s">'countdown-timer'</span><span class="pl-kos">,</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">idle</span>: <span class="pl-kos">{</span>  <span class="pl-c">// 1st screen, no timer set</span>
-    <span class="pl-c1">set</span>: <span class="pl-s">'setting'</span><span class="pl-kos">,</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">setting</span>: <span class="pl-kos">{</span> <span class="pl-c">// entering time value</span>
-    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">start</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span> <span class="pl-c">// completed  setting timer time</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">running</span>: <span class="pl-kos">{</span>
-    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">expire</span>: <span class="pl-s">'alarm'</span><span class="pl-kos">,</span> <span class="pl-c">// countdown reached 0</span>
-    <span class="pl-c1">pause</span>: <span class="pl-s">'paused'</span><span class="pl-kos">,</span> <span class="pl-c">// stop countdown, current value is on hold</span>
-    <span class="pl-c1">reset</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span> <span class="pl-c">// stop countdown, return to after the time is set</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">paused</span>: <span class="pl-kos">{</span>
-    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">reset</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">resume</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">alarm</span>: <span class="pl-kos">{</span>
-    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">stop</span>: <span class="pl-s">'standby'</span><span class="pl-kos">,</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-  <span class="pl-c1">standby</span>: <span class="pl-kos">{</span> <span class="pl-c">// timer reset, awaiting to start</span>
-    <span class="pl-c1">delete</span>: <span class="pl-s">'idle'</span><span class="pl-kos">,</span>
-    <span class="pl-c1">start</span>: <span class="pl-s">'running'</span><span class="pl-kos">,</span>
-  <span class="pl-kos">}</span><span class="pl-kos">,</span>
-<span class="pl-kos">}</span></pre></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-
-
-```js
-switch (data.get('state')) {
-
-  case 'setting':
-    if (event === 'start') {
-      data.set('state', 'running')
-    }
-    break;
-
-  case 'running':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'expire') {
-      data.set('state', 'alarm')
-    } else if (event === 'pause') {
-      data.set('state', 'paused')
-    } else if (event === 'reset') {
-      data.set('state', 'standby')
-    }
-    break;
-
-  case 'paused':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'pause') {
-      data.set('state', 'paused') // Remain in paused state
-    } else if (event === 'resume') {
-      data.set('state', 'running')
-    }
-    break;
-
-  case 'alarm':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'stop') {
-      data.set('state', 'standby')
-    }
-    break;
-
-  case 'standby':
-    if (event === 'delete') {
-      data.set('state', 'setting')
-    } else if (event === 'start') {
-      data.set('state', 'running')
-    }
-    break;
-
-  default:
-    data.set('state', 'setting')
-    break;
-}
-```
-
-```js
-const states ={
-  _: {
-    id: 'countdown-timer',
-  },
-  idle: {  // 1st screen, no timer set
-    set: 'setting',
-  },
-  setting: { // entering time value
-    delete: 'idle',
-    start: 'running', // completed  setting timer time
-  },
-  running: {
-    delete: 'idle',
-    expire: 'alarm', // countdown reached 0
-    pause: 'paused', // stop countdown, current value is on hold
-    reset: 'standby', // stop countdown, return to after the time is set
-  },
-  paused: {
-    delete: 'idle',
-    reset: 'standby',
-    resume: 'running',
-  },
-  alarm: {
-    delete: 'idle',
-    stop: 'standby',
-  },
-  standby: { // timer reset, awaiting to start
-    delete: 'idle',
-    start: 'running',
-  },
-}
-```
-
-The FSM is a very <i>simple object<i>.  Each state is a key within `states={}`.  Each sub-objects have transitions (AKA triggers) listed as keys, with their values are the destination states.  Easy for everyone to read!  There are some conventions:
-- you bring your own state-storage, be it a simple JS `Map()`, `useState()` hook from React, 'alien-signals` ({example}(https://github.com/tomByrer/state-shifter/blob/main/packages/simple-state-shifter/demos/02-firepit-timers.js#L7-L26)), whatever!
-  - declare your base state & context names & defaults in the `presets=[ [key, value]]` array
-- in `states={}`:
-  - first `_` state is NOT a 'state', but a configuration object.
-    - `id` is used by state-shifter to define the state-storage
-  - second key is the 'inital' state 
-
-### Advanced with functions
-
-```js
-import createMachine from '../simple-state-shifter'
-
-export const presets = [
-  ['firepit-state', ''], // <- base state
-  // 'context' is defined below
-  ['fire pile', 0],
-]
-export const data = new Map(presets)
-
-
-/* functions for states */
-function fuel(){
-  data.set('fire pile', data.get('fire pile') + 1)
-  console.log('🪵 fire pile is now', data.get('fire pile'), 'high')
-}
-
-
-export const states ={
-  _: { // 1st 'state' is configuration
-    id: 'firepit',
-  },
-  // 2nd state is inital / default '1st state'
-  empty: {
-    fuel: ()=>{
-      fuel()
-      return 'standby' // return a new state if you want
-    },
-  standby: {
-    empty: ()=>{
-      data.set('fire pile', 0)
-      return 'empty'
-    },
-    fuel: ()=>{ fuel() }, // if you do not want to change states, don't return
-    ignite: 'burning',
-  },
-  burning: {
-    _: {
-      fnEnter: ()=>{ console.log('🔥 fire burns') }, // AKI onEnter
-    },
-    extinguish: 'smoldering',
-    fuel: ()=>{ fuel() }, 
-  },
-  smoldering: { // simulate embers still burning
-    cover: 'empty',
-    fuel:()=>{
-      fuel()
-      console.log('✨ embers respark the fire')
-      return 'burning'
-    },
-    water: 'wet',
-  },
-  wet: {
-    dry: 'empty',
-  },
-}
-```
-
+The simple-state-shifter FSM is a short <i>clean object<i> while the same result in plain JavaScript requires many statements!  FSMs can help with development and debugging speed.
 
 ## Usage
 
@@ -274,36 +39,17 @@ bun i
 bun run run-demos.js
 ```
 
-```js
+
+* Each state is a key within `states={}`.  Each sub-objects have transitions (AKA triggers) listed as keys, with their values are the destination states.  Easy for everyone to read!  There are some conventions:
+* you bring your own state-storage, be it a simple JS `Map()`, `useState()` hook from React, 'alien-signals` ({example}(https://github.com/tomByrer/state-shifter/blob/main/packages/simple-state-shifter/demos/02-firepit-timers.js#L7-L26)), whatever!
+  + declare your base state & context names & defaults in the `presets=[ [key, value]]` array
+* in `states={}`:
+  + *Optional:* first `_` state is NOT a 'state', but a configuration object.
+    - `id` is used by state-shifter to define the state-storage
+  + First non-optional key is the 'inital' state always
+
 
 
 ## Licence
 
  (C)2025 Tom Byrer, rights reserved, but ask me about OSS / usage License
-
-
-```mermaid
----
-config:
-  theme: forest
-  look: handDrawn
-  layout: dagre
----
-stateDiagram
-  direction LR
-  [*] --> flashing
-  flashing --> preempted:next
-  preempted --> flashing:error
-  preempted --> stop:next
-  preempted --> preempted:preempt
-  stop --> flashing:error
-  stop --> go:next
-  stop --> preempted:preempt
-  go --> flashing:error
-  go --> caution:next
-  go --> preempted:preempt
-  caution --> flashing:error
-  caution --> stop:next
-  caution --> preempted:preempt
-
-```
