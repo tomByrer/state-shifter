@@ -11,6 +11,8 @@ state-shifter seeks to make FSMs easy to learn, fun to build, while maximizing J
 
 ## Example
 
+#### [live demo where you can press buttons to send triggers](https://tombyrer.github.io/state-shifter/demos.html)
+
 <details>
 <summary>Click to open background for this plain-js / `simple-state-shifter` comparison:</summary>
 A client wants you to build a 'countdown timer' (sometimes found as Pomodoro timer).  He wants it to have the following modes:  
