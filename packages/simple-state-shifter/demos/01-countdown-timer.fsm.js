@@ -34,7 +34,7 @@ export const states ={
   },
   alarm: {
     delete: 'setting',
-    stop: 'standby',
+    reset: 'standby', // AKA 'stop the alarm'
   },
   standby: { // timer reset, awaiting to start
     delete: 'setting',

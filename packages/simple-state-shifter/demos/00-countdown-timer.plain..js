@@ -66,7 +66,7 @@ trigger(event) {
     case 'alarm':
       if (event === 'delete') {
         data.set('state', 'setting')
-      } else if (event === 'stop') {
+      } else if (event === 'reset') {
         data.set('state', 'standby')
       }
       break;
