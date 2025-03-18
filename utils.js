@@ -5,19 +5,29 @@ export function machineSequence(machine, data, sequence=[]){
   console.log('init entry state:', data.get(machine.stateId), '\n')
   if (data.effect){
     data.effect(() => {
-      console.log(` e: ${data.get(machine.stateId)}`);
+      console.log(` effect: ${data.get(machine.stateId)}`);
     })
   }
-  // console.log("branches:", machine.branches)
-  // console.log("fullMap:", machine.fullMap)
+  
+  const wait =(ms=2000)=> new Promise(res => setTimeout(res, ms))
   const len = sequence.length
-  for (let i=0; i<len; i++) {
-    console.log(i, 'trigger:', sequence[i])
-    machine.trigger(sequence[i])
-    console.log(i,
-      'state:', data.get(machine.stateId), '\n',
-    )
+  async function loopWithWait(){
+    for (let i=0; i<len; i++) {
+      // https://regex101.com/r/sXTFia/2
+      const waitSeconds = sequence[i].match(/^wait\((?<param>\d+)\)/)?.groups?.param
+      if (waitSeconds){
+        console.log('wait', waitSeconds)
+        await wait(waitSeconds*1000)
+      }
+      else {
+        console.log(i, 'trigger:', sequence[i])
+        machine.trigger(sequence[i])
+      }
+      console.log(i, 'state:',  machine.getState(), ', triggers:', machine.getTriggers(), '\n',
+      )
+    }
   }
+  loopWithWait()
 }
 
 export class Timer {

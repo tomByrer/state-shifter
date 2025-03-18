@@ -32,7 +32,7 @@ export default function createMachine(
   }
   // init
   data.set( machine.stateId, Object.keys(definition)[ (id) ? 1 : 0 ] ) // if id proved, then inital state must be 2nd
-  // get current
+  // return current
   machine.getState = function(){ return data.get(machine.stateId) }
   machine.getTriggers = function(){ return Object.keys( definition[ data.get(machine.stateId) ]) }
 

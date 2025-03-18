@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "devDependencies": {
-    "alien-signals": "0.6.0",
-    "bun": "^1.2.0"
+    "alien-signals": "~1.0.4",
+    "bun": "~1.2.4"
   }
 }

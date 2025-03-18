@@ -1,5 +1,5 @@
 /* countdown-timer v01.03 (c) 2025 Tom Byrer */
-/* https://www.mermaidchart.com/play#pako:eNp9UDFuwzAM_ArhsYA-wCFTxk5Z6wysxdhCbcqQaCRB0L_Hoh3AaOBOIu94dyIfVRM9V1g552ppolxCi7UAaMcDI1xi4qwF6GP8QehI_DHRVQyie5wUwVObuBazyErKxzAjNJQZHxI3GqLA56n0Xx9ncO4AmVWDtAVaS4PTJFJqhNkoWfAL2qjQc8_Kf1nqKQ3ItzGkN26kKbNHe95cdd7q-47zqmyRy_BO4pb8R7gGFG4aTGjf2zHdcKtn1jjadZZ-R7dlX4nr5arfJxGwpRE
+/* https://www.mermaidchart.com/play#pako:eNp9kDEOwjAMRa9idUTKBTwwMTKxUgbTuG1E66DUFVSIu9OEIkWgMsV53_4_zqOovOUCC2NMKZWX2jVYCoC23DNC7QMPGkHn_QWhJbG7QDdJiCY_KoKlJnApyWJQUt65mVAfe6wLXKnzAvtDvB83JzBmCwOrOmkiWsqEwygSa4TZKKTgD8qm0HLHyt8qdRR65PvVhR_tSuPAFtPx46rzVucJ51U5Rb6bVxJz8c_gEhC1sU-D6Xkrppn27bmAlcFc_UQuX1c8X7eipW4
 stateDiagram
   [*] --> setting
   setting --> running:start

@@ -3,9 +3,9 @@ import { execSync } from "child_process";
 import readline from "readline";
 
 const files = [
-  "./packages/simple-state-shifter/demos/00-firepit-basic.js",
-  "./packages/simple-state-shifter/demos/01-firepit-functions.js",
-  "./packages/simple-state-shifter/demos/02-firepit-timers.js",
+  "./packages/simple-state-shifter/demos/00-countdown-timer.plain.js",
+  "./packages/simple-state-shifter/demos/01-countdown-timer.fsm.js",
+  "./packages/simple-state-shifter/demos/02-countdown-timer.full.js",
 ]
 const waitForKeyPress = () => {
   const rl = readline.createInterface({

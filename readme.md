@@ -30,23 +30,26 @@ Not all of these modes are to be accessible to each other; only a few triggers w
 Your client becomes dizzy trying to read your flowchart, so you promise him that you'll return with a quick program to demo the state transitions.  Unfortunately, you also become dizzy from all nest of `switch case if else` statements that you had to type in to get it working.  Fortunately, a friend told you about 'simple-state-shifter'.  Refactoring, you're amazed that typing in the core transition->state logic was easy & fun.  Even your client understands it!
 </details>
 
-![comparison of plain JavaScript code (47 lines) versus simple-state-shifter (25 lines of code)](./docs/js-vs-simple-state-shifter.avif)
+comparison of plain JavaScript code (65 lines) versus simple-state-shifter (25 lines of code]
+![comparison of plain JavaScript code (65 lines) versus simple-state-shifter (25 lines of code](https://github.com/user-attachments/assets/47c3ba20-5d79-4691-9b5b-4930668064ac)
+[(theme: tawny-owl)](https://github.com/tomByrer/tawny-owl-theme)
 
 The simple-state-shifter FSM is a short <i>clean object<i> while the same result in plain JavaScript requires many statements!  FSMs can help with development and debugging speed.
 
 ## Usage
 
+Run demos:
 ```bash
 bun i
 bun run run-demos.js
 ```
-
+> test
 
 * Each state is a key within `states={}`.  Each sub-objects have transitions (AKA triggers) listed as keys, with their values are the destination states.  Easy for everyone to read!  There are some conventions:
-* you bring your own state-storage, be it a simple JS `Map()`, `useState()` hook from React, 'alien-signals` ({example}(https://github.com/tomByrer/state-shifter/blob/main/packages/simple-state-shifter/demos/02-firepit-timers.js#L7-L26)), whatever!
+* you bring your own state-storage, by default it is a simple JS `Map()`, but for better DX I also used  'alien-signals` ({example}(https://github.com/tomByrer/state-shifter/blob/main/packages/simple-state-shifter/demos/02-countdown-timer.full))!
   + declare your base state & context names & defaults in the `presets=[ [key, value]]` array
 * in `states={}`:
-  + *Optional:* first `_` state is NOT a 'state', but a configuration object.
+  + *Optional configuration object:* IF first `_` state is present NOT a 'state', but a configuration object.
     - `id` is used by state-shifter to define the state-storage
   + First non-optional key is the 'inital' state always
 
