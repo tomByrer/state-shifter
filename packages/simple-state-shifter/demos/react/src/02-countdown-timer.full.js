@@ -16,13 +16,14 @@ stateDiagram
   standby --> running:start
 */
 import * as AS from 'alien-signals'
-import createMachine from '../simple-state-shifter'
+import createMachine from './simple-state-shifter'
 
 export const presets = [
   ['state', ''],
-  ['defaultSeconds', 0],  // usually 0, but for Pomodro
+  ['defaultSeconds', 5],  // fallback when deleted, set > 0 for demp/testing
+  ['inputSeconds', 0],  // user/UI input time for reset
   ['intervalID', ''],
-  ['remainingSeconds', 0], // same as duration
+  ['remainingSeconds', 99], // same as duration
 ]
 export function createSignalStore(presets) {
   const store = {}
@@ -60,8 +61,8 @@ export function log(str='default log'){
 
 const FN ={
   delete: function(){ // resets time back to default
-    data.set('defaultSeconds', 0)
-    data.set('remainingSeconds', 0)
+    data.set('inputSeconds', data.get('defaultSeconds'))
+    data.set('remainingSeconds', data.get('defaultSeconds'))
     log(`DELETEd`)
   },
   expire: function(){
@@ -74,7 +75,7 @@ const FN ={
     log(`PAUSEd at ${data.get('remainingSeconds')} sec`)
   },
   reset: function(){ // resets time back to last set time from start
-    data.set( 'remainingSeconds', data.get('defaultSeconds') )
+    data.set( 'remainingSeconds', data.get('inputSeconds') )
     log(`RESET countdown back to ${data.get('remainingSeconds')} sec`)
   },
   resume: function(){
@@ -85,14 +86,14 @@ const FN ={
       if (remaining <= 0) {
         machine.trigger('expire')
       }
-    }, 1000);
+    }, 1000)
     
     data.set( 'intervalID', intID )
   },
-  start: function(sec=data.get('defaultSeconds')){
-    data.set('defaultSeconds', sec)
+  start: function(sec=data.get('inputSeconds')){
+    data.set('inputSeconds', sec)
     data.set('remainingSeconds', sec)
-    log(`START timer ${data.get('defaultSeconds')} sec`)
+    log(`START timer ${data.get('inputSeconds')} sec`)
     // we are not actually 'resuming', but let's streamline conserns
     this.reset()
     this.resume()
@@ -102,7 +103,7 @@ const FN ={
 export const states ={
   setting: {  // 1st screen, no timer set
     start: (sec)=>{
-      sec ||= data.get('defaultSeconds')
+      sec ||= data.get('remainingSeconds')
       if (sec > 0){
         FN.start(sec)
         return 'running'
@@ -132,26 +133,26 @@ export const machine = createMachine(states, data)
 /*^ end finite state machine */
 
 // automatically run demostration
-import { machineSequence } from '../../../utils'
-console.log(`Running working countdown timer
-using simple-state-shifter:`)
+// import { machineSequence } from './utils'
+// console.log(`Running simple-state-shifter version of countdown-timer,
+// output should equal 'plain' JS version:`)
 
-machineSequence(
-  machine, machine.data,
-  [
-    'reset', // noop; should be in setting already
-    'start', // setting -> running
-    'wait(1)',
-    'pause', // running -> paused
-    'wait(1)',
-    'resume', // paused -> running
-    'wait(6)',
-    // 'expire', // running -> alarm
-    'reset', // alarm -> standby
-    'start', // standby -> running
-    // 'reset', // running -> stanby
-    'wait(3)',
-    'delete', // stanby -> setting
-  ],
-  'remainingSeconds', // watch/effect
-)
+// machineSequence(
+//   machine, machine.data,
+//   [
+//     'reset', // noop; should be in setting already
+//     'start', // setting -> running
+//     'wait(1)',
+//     'pause', // running -> paused
+//     'wait(1)',
+//     'resume', // paused -> running
+//     'wait(6)',
+//     // 'expire', // running -> alarm
+//     'reset', // alarm -> standby
+//     'start', // standby -> running
+//     // 'reset', // running -> stanby
+//     'wait(3)',
+//     'delete', // stanby -> setting
+//   ],
+//   'remainingSeconds', // watch/effect
+// )

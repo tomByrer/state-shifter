@@ -1,0 +1,607 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --cBlack: #150f0a;
+  --cWhite: #d7d8d1ce;
+  --cGray: #d7d8d166;
+  --cBlue: #87a2b2;
+  --cHighlight: #c8e4cd; /* was cde498 */
+
+  color-scheme: light dark;
+  color: var(--cWhite);
+  background-color: var(--cBlack);
+}
+
+body, html {
+  padding: 1.162em;
+  min-width:100%;
+}
+
+body {
+  position: fixed;
+  overflow-y: scroll;
+  padding: 0;
+}
+
+
+main {
+  display: grid;
+  grid-template-columns:
+    1fr
+    min(88ch, 100%)
+    1fr
+  ;
+  grid-template-rows: auto auto auto;
+  gap: 1.62em;
+}
+.full-width {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+#timer {
+  grid-column: 3;
+  grid-row: 1;
+  width: 16.18em;
+  text-align: center;
+  color: var(--cBlack);
+  background-color: var(--cBlue);
+  border-radius: 1em;
+  box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+  
+  .input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+
+    b {
+      font-size: 1.618em;
+      padding-bottom: .31em;
+    }
+  }
+  .input-container input {
+    width: 3.6em;
+    padding: 0.4em;
+    margin: 0 0.16em;
+    font-size: 1.16em;
+    text-align: center;
+    border: 1px solid var(--cGray);
+    border-radius: .81em;
+  }
+  
+  .display-time {
+    margin-top: 1em;
+  }
+  .display-time p {
+    margin: 0;
+    font-size: 1.618em;
+    font-weight: 700;
+  }
+  /* li {
+    display: inline-block;
+    font-size: 1rem;
+    list-style-type: none;
+    padding: .68rem;
+    text-transform: uppercase;
+  }
+  
+  li span {
+    display: block;
+    font-size: 1.68rem;
+  } */
+}
+
+
+footer {
+  grid-column: 2;
+  grid-row: 3;
+  /* min-width: 18em; */
+
+  svg {
+    float: left;
+  }
+  path {
+    fill: var(--cWhite);;
+  }
+}
+
+#fsm {
+  grid-column: 2;
+  grid-row: 1;
+}
+#fsmio {
+  font-size: 113%;
+  
+  b, i {
+    display: inline-block;
+    padding-left: 0.32em;
+    inline-size: 4.4em;
+    color: var(--cHighlight);
+  }
+  .nav { /* ButtonList */
+    display: inline-block;
+    margin: 0;
+  }
+}
+
+
+#code {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: flex-end;
+  justify-self: end;
+  font-size: 1.22em;
+
+  span.active {
+    padding: .11em;
+    border-radius: .32em;
+    color: var(--cBlack);
+    background-color: var(--cHighlight);
+  }
+}
+
+#fsmsvg {
+  grid-column: 2;
+  grid-row: 2;
+  font-family: arial, sans-serif;
+  font-size: 11px;
+  background-color: #d7d8d1;
+  fill: #000000;
+
+  @keyframes edge-animation-frame {
+    from {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .edge-animation-slow {
+    stroke-dasharray: 9, 5 !important;
+    stroke-dashoffset: 900;
+    animation: dash 50s linear infinite;
+    stroke-linecap: round;
+  }
+
+  .edge-animation-fast {
+    stroke-dasharray: 9, 5 !important;
+    stroke-dashoffset: 900;
+    animation: dash 20s linear infinite;
+    stroke-linecap: round;
+  }
+
+  .error-icon {
+    fill: #552222;
+  }
+
+  .error-text {
+    fill: #552222;
+    stroke: #552222;
+  }
+
+  .edge-thickness-normal {
+    stroke-width: 1px;
+  }
+  .edge-thickness-thick {
+    stroke-width: 3.5px;
+  }
+  .edge-pattern-solid {
+    stroke-dasharray: 0;
+  }
+  .edge-thickness-invisible {
+    stroke-width: 0;
+    fill: none;
+  }
+  .edge-pattern-dashed {
+    stroke-dasharray: 3;
+  }
+  .edge-pattern-dotted {
+    stroke-dasharray: 2;
+  }
+
+  .marker {
+    fill: #000000;
+    stroke: #000000;
+  }
+
+  .marker.cross {
+    stroke: #000000;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  defs #statediagram-barbEnd {
+    fill: #000000;
+    stroke: #000000;
+  }
+
+  g.stateGroup text {
+    fill: #13540c;
+    stroke: none;
+    font-size: 10px;
+  }
+
+  g.stateGroup text {
+    fill: #000000;
+    stroke: none;
+    font-size: 10px;
+  }
+
+  g.stateGroup .state-title {
+    font-weight: bolder;
+    fill: #321b67;
+  }
+
+  g.stateGroup rect {
+    fill: var(--cHighlight);
+    stroke: #13540c;
+  }
+
+  g.stateGroup line {
+    stroke: #000000;
+    stroke-width: 1;
+  }
+
+  .transition {
+    stroke: #000000;
+    stroke-width: 1;
+    fill: none;
+  }
+
+  .stateGroup .composit {
+    fill: white;
+    border-bottom: 1px;
+  }
+
+  .stateGroup .alt-composit {
+    fill: #e0e0e0;
+    border-bottom: 1px;
+  }
+
+  .state-note {
+    stroke: #6eaa49;
+    fill: #fff5ad;
+  }
+
+  .state-note text {
+    fill: black;
+    stroke: none;
+    font-size: 10px;
+  }
+
+  .stateLabel .box {
+    stroke: none;
+    stroke-width: 0;
+    fill: var(--cHighlight);
+    opacity: 0.5;
+  }
+
+  .edgeLabel .label rect {
+    fill: var(--cHighlight);
+    opacity: 0.5;
+  }
+
+  .edgeLabel {
+    background-color: #e8e8e8;
+    text-align: center;
+  }
+
+  .edgeLabel p {
+    background-color: #e8e8e8;
+  }
+
+  .edgeLabel rect {
+    opacity: 0.5;
+    background-color: #e8e8e8;
+    fill: #e8e8e8;
+  }
+
+  .edgeLabel .label text {
+    fill: #000000;
+  }
+
+  .label div .edgeLabel {
+    color: #000000;
+  }
+
+  .stateLabel text {
+    fill: #321b67;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  .node circle.state-start {
+    fill: #000000;
+    stroke: #000000;
+  }
+
+  .node .fork-join {
+    fill: #000000;
+    stroke: #000000;
+  }
+
+  .node circle.state-end {
+    fill: var(--cHighlight);
+    stroke: white;
+    stroke-width: 1.5;
+  }
+
+  [data-look="neo"].node circle.state-end {
+    filter: none;
+    stroke: white;
+    fill: #000000;
+  }
+
+  .end-state-inner {
+    fill: white;
+    stroke: white;
+    stroke-width: 1.5;
+  }
+
+  .node rect {
+    fill: var(--cHighlight);
+    stroke: #13540c;
+    stroke-width: 1px;
+  }
+
+  .node-rect-neo {
+    fill: var(--cHighlight);
+    stroke: none;
+    stroke-width: 1px;
+  }
+
+  .node polygon {
+    fill: var(--cHighlight);
+    stroke: #13540c;
+    stroke-width: 1px;
+  }
+
+  #statediagram-barbEnd {
+    fill: #000000;
+  }
+
+  .statediagram-cluster rect {
+    fill: var(--cHighlight);
+    stroke: #13540c;
+    stroke-width: 1px;
+  }
+
+  .cluster-label,
+  .nodeLabel {
+    color: #321b67;
+    line-height: 1.0;
+  }
+
+  .statediagram-cluster rect.outer {
+    rx: 5px;
+    ry: 5px;
+  }
+
+  .statediagram-state .divider {
+    stroke: #13540c;
+  }
+
+  .statediagram-state .title-state {
+    rx: 5px;
+    ry: 5px;
+  }
+
+  .statediagram-cluster.statediagram-cluster .inner {
+    fill: white;
+  }
+
+  .statediagram-cluster.statediagram-cluster-alt .inner {
+    fill: #f0f0f0;
+  }
+
+  .statediagram-cluster .inner {
+    rx: 0;
+    ry: 0;
+  }
+
+  .statediagram-state rect.basic {
+    rx: 5px;
+    ry: 5px;
+  }
+
+  .state-shadow-neo {
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  .statediagram-state rect.divider {
+    stroke-dasharray: 10, 10;
+    fill: #f0f0f0;
+  }
+
+  .note-edge {
+    stroke-dasharray: 5;
+  }
+
+  .statediagram-note rect {
+    fill: #fff5ad;
+    stroke: #6eaa49;
+    stroke-width: 1px;
+    rx: 0;
+    ry: 0;
+  }
+
+  .statediagram-note rect {
+    fill: #fff5ad;
+    stroke: #6eaa49;
+    stroke-width: 1px;
+    rx: 0;
+    ry: 0;
+  }
+
+  .statediagram-note text {
+    fill: black;
+  }
+
+  .statediagram-note .nodeLabel {
+    color: black;
+  }
+
+  .node.statediagram-note rect {
+    stroke: #6eaa49 !important;
+  }
+
+  .statediagram .edgeLabel {
+    color: red;
+  }
+
+  #dependencyStart,
+  #dependencyEnd {
+    fill: #000000;
+    stroke: #000000;
+    stroke-width: 1;
+  }
+
+  .statediagramTitleText {
+    text-anchor: middle;
+    font-size: 18px;
+    fill: #000000;
+  }
+
+  .node .neo-node {
+    stroke: #13540c;
+  }
+
+  [data-look="neo"].node rect,
+  [data-look="neo"].cluster rect,
+  [data-look="neo"].node polygon {
+    stroke: url(-gradient);
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  [data-look="neo"].node path {
+    stroke: url(-gradient);
+  }
+
+  [data-look="neo"].node .outer-path {
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  [data-look="neo"].node .neo-line path {
+    stroke: hsl(78.1578947368, 18.4615384615%, 64.5098039216%);
+    filter: none;
+  }
+
+  [data-look="neo"].node circle {
+    stroke: url(-gradient);
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  [data-look="neo"].node circle .state-start {
+    fill: #000000;
+  }
+
+  [data-look="neo"].statediagram-cluster rect {
+    fill: var(--cHighlight);
+    stroke: url(-gradient);
+    stroke-width: 1px;
+  }
+
+  [data-look="neo"].icon-shape .icon {
+    fill: url(-gradient);
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  [data-look="neo"].icon-shape .icon-neo path {
+    stroke: url(-gradient);
+    filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 0.5));
+  }
+
+  :root {
+    --mermaid-font-family: "trebuchet ms", verdana, arial, sans-serif;
+  }
+
+
+  [data-et="node"] g {
+    path:nth-child(1) {
+      stroke: lightgray;
+    }
+
+    path:nth-child(2) {
+      stroke: whitesmoke;
+    }
+  }
+
+  [data-et="edge"] {
+    stroke: #999;
+    stroke-dasharray: 5 2;
+  }
+
+  /* g.setting g { */
+  .active g {
+    path:nth-child(1) {
+      stroke: var(--cHighlight);
+    }
+
+    path:nth-child(2) {
+      stroke: #13540c;
+    }
+  }
+
+  .active {
+    stroke: #13540c;
+    stroke-dasharray: none;
+  }
+
+  .edgeLabel.active p {
+    background-color: var(--cHighlight);
+  }
+
+
+}
+
+a {
+  font-weight: 500;
+  color: var(--cBlue);
+  text-decoration: inherit;
+}
+a:hover {
+  cursor: pointer;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 1.16em;
+  font-weight: 400;
+  font-family: inherit;
+  /* background-color: #1a1a1a; */
+
+  margin: .324em .324em .162em .324em;
+  padding: 0 .162em .162em .162em;
+  min-width: 4.16em;
+  background-color: var(--cGray);
+  color: var(--cBlack);
+
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button.active {
+  font-weight: 500;
+  background-color:var(--cHighlight); /* #dff6aa; */
+}
+/* button:hover {
+  border-color: #646cff;
+} */
+button:focus,
+button:focus-visible {
+  outline: 6px auto -webkit-focus-ring-color;
+}
