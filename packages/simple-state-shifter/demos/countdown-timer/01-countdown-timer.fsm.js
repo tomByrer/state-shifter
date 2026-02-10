@@ -15,7 +15,7 @@ stateDiagram
   standby --> setting:delete
   standby --> running:start
 */
-import createMachine from '../simple-state-shifter'
+import createMachine from 'simple-state-shifter'
 
 export const states ={
   setting: {  // 1st screen, no timer set
@@ -64,18 +64,30 @@ output should equal 'plain' JS version:`)
 
 // console.log([...new Set(getAllValues(states))] ); // Output: [1, 2, 3, 4, 5, 6]
 
-import { machineSequence } from '../../../utils'
-machineSequence(
-  machine, machine.data,
-  [
-    'reset', // noop; should be in setting already
-    'start', // setting -> running
-    'pause', // running -> paused
-    'resume', // paused -> running
-    'expire', // running -> alarm
-    'stop', // alarm -> standby
-    'start', // standby -> running
-    'reset', // running -> stanby
-    'delete', // stanby -> setting
-  ],
-)
+// import { machineSequence } from '../../../../utils'
+// machineSequence(
+//   machine, machine.data,
+//   [
+//     'reset', // noop; should be in setting already
+//     'start', // setting -> running
+//     'pause', // running -> paused
+//     'resume', // paused -> running
+//     'expire', // running -> alarm
+//     'stop', // alarm -> standby
+//     'start', // standby -> running
+//     'reset', // running -> standby
+//     'delete', // standby -> setting
+//   ],
+// )
+
+
+console.log('(current state ~ [ available trigger(s) ])')
+console.log(`machine.getState():`,machine.getState(), '~', `machine.getTriggers():`, machine.getTriggers())
+console.log(`(machine.trigger('reset') will return 'undefined' since SSS doesn't return anything) & should be no op`)
+console.log(`machine.trigger('reset')`,machine.trigger('reset'))
+console.log(machine.getState(), '~', machine.getTriggers())
+console.log(`machine.trigger('start')`,machine.trigger('start'))
+console.log(machine.getState(), '~', machine.getTriggers())
+console.log(`machine.trigger('pause')`,machine.trigger('pause'))
+console.log(machine.getState(), '~', machine.getTriggers())
+console.log(`machine.trigger('resume')`,machine.trigger('resume'))

@@ -15,70 +15,61 @@ stateDiagram
   standby --> setting:delete
   standby --> running:start
 */
-import * as AS from 'alien-signals'
-import createMachine from '../simple-state-shifter'
+import createMachine from '../../simple-state-shifter'
+import SignalMapish from 'alien-signals-mapish'
 
 export const presets = [
   ['state', ''],
-  ['defaultSeconds', 0],  // usually 0, but for Pomodro
+  ['defaultSeconds', 5],  // usually 0, but for Pomodro
   ['intervalID', ''],
   ['remainingSeconds', 0], // same as duration
 ]
-export function createSignalStore(presets) {
-  const store = {}
-  const len = presets.length
-  for (let i = 0; i < len; i++){
-    const [key, value] = presets[i]
-    store[key] = AS.signal(value)
-  }
+/*
 
-  function effect(fn) {
-    AS.effect(fn)
-  }
+* state
+* effect(() => {
+*   console.log(`State is: ${count.get('state)}`);
+* }); // Console: State is: 1
+*/
 
-  function get(key = 'state') {
-    return store[key]() // Returns undefined if the key doesn't exist
-  }
+export const data = new SignalMapish(presets)
+// console.log('AS store:', data.store)
 
-  function set(key, value) {
-    store[key](value)
-  }
-
-  return {
-    store,
-    effect,
-    get,
-    set,
-  }
-}
-export const data = new createSignalStore(presets)
+const res = data.get('nothere')
+console.log(`data.get('nothere')`, res) // should return undefined
 
 // helper
 export function log(str='default log'){
   console.log(str)
 }
 
+data.effect(() => {
+  console.log( '⏰ ', data.get('remainingSeconds') );
+}); // Console: Count is: 1
+
+
+// as a convenance / convention, put all FuNctions for the FSM into an object
 const FN ={
   delete: function(){ // resets time back to default
-    data.set('defaultSeconds', 0)
+    // data.set('defaultSeconds', 0)
     data.set('remainingSeconds', 0)
-    log(`DELETEd`)
+    log(`ran DELETEd`)
   },
   expire: function(){
     // this.stop() //TODO? cleanup
-    log(`EXPIREd, alarm sound`)
+    log(`ran EXPIREd, alarm sound`)
   },
   pause: function(){
     clearInterval(data.get('intervalID'))
     data.set('intervalID', '')
-    log(`PAUSEd at ${data.get('remainingSeconds')} sec`)
+    log(`ran PAUSEd at ${data.get('remainingSeconds')} sec`)
   },
   reset: function(){ // resets time back to last set time from start
     data.set( 'remainingSeconds', data.get('defaultSeconds') )
-    log(`RESET countdown back to ${data.get('remainingSeconds')} sec`)
+    log(`ran RESET countdown back to ${data.get('remainingSeconds')} sec`)
   },
   resume: function(){
-    log(`RESUME countdown at ${data.get('remainingSeconds')} sec`)
+    log(`ran RESUME countdown at ${data.get('remainingSeconds')} sec`)
     const intID = setInterval(() => {
       const remaining = data.get('remainingSeconds') - 1
       data.set('remainingSeconds', remaining)
@@ -92,8 +83,8 @@ const FN ={
   start: function(sec=data.get('defaultSeconds')){
     data.set('defaultSeconds', sec)
     data.set('remainingSeconds', sec)
-    log(`START timer ${data.get('defaultSeconds')} sec`)
-    // we are not actually 'resuming', but let's streamline conserns
+    log(`ran START timer ${data.get('defaultSeconds')} sec`)
+    // we are not actually 'resuming', but let's streamline concerns
     this.reset()
     this.resume()
   },
@@ -131,27 +122,37 @@ export const states ={
 export const machine = createMachine(states, data)
 /*^ end finite state machine */
 
-// automatically run demostration
-import { machineSequence } from '../../../utils'
-console.log(`Running working countdown timer
-using simple-state-shifter:`)
 
-machineSequence(
-  machine, machine.data,
-  [
-    'reset', // noop; should be in setting already
-    'start', // setting -> running
-    'wait(1)',
-    'pause', // running -> paused
-    'wait(1)',
-    'resume', // paused -> running
-    'wait(6)',
-    // 'expire', // running -> alarm
-    'reset', // alarm -> standby
-    'start', // standby -> running
-    // 'reset', // running -> stanby
-    'wait(3)',
-    'delete', // stanby -> setting
-  ],
-  'remainingSeconds', // watch/effect
-)
+/*^ begin demo tests */
+console.log(`'machine' init using simple-state-shifter:`)
+
+const wait = (ms) => new Promise(res => setTimeout(res, ms))
+function currentStatus(){
+  console.log(`  state >`, machine.getState(),
+    `< with triggers:`, machine.getTriggers())
+}
+function logTrigger(trigger, note){
+  console.log(`💻machine.trigger('${trigger}') // ${note}`)
+  machine.trigger(trigger)
+  currentStatus()
+}
+currentStatus()
+async function runDemo() {
+  logTrigger('reset', `noop; should be in setting already`)
+  logTrigger('start(6)', `setting -> running`)
+  await wait(2200)
+  logTrigger('pause', `running -> paused`) 
+  await wait(2000)
+  logTrigger('start', `noop; should send 'resume'`)
+  await wait(2200)
+  logTrigger('resume')
+  await wait(6200)
+  logTrigger('start', `still in alarm, so noop`) 
+  await wait(3200)
+  logTrigger('reset', `alarm -> standby`) 
+  logTrigger('start', `standby -> running`) 
+  await wait(2200)
+  logTrigger('delete', `running -> setting`) 
+}
+runDemo()
+/*^ end demo */

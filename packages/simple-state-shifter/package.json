@@ -1,11 +1,9 @@
 {
   "name": "simple-state-shifter",
-  "version": "0.6.0",
   "main": "simple-state-shifter.js",
+  "version": "1.0.0",
+  "description": "mini Finite State Machine (FSM)",
   "scripts": {
-    "build": "echo Building package-a"
-  },
-  "devDependencies": {
-    "bun": "^1.2.0"
+    "demo": "bun run ./demos/trafficlight/02-trafficlight.signals.js"
   }
 }

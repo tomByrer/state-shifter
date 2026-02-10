@@ -1,14 +1,14 @@
-/* v0.7.0 simple-state-shifter (C)2025 Tom Byrer, rights reserved, but ask me about OSS License */
+/* v1.0.0 simple-state-shifter (C)2025-2026 Tom Byrer, rights reserved, but ask me about OSS License */
 export default function createMachine(
   definition, // state-transition object
   data=new Map([['state','']]), // allow external state & context storage, must have get(key) & set(key, value) methods
-  id=definition?._?.id // in case you want to run mulitple machines in same data
+  stateId='state' // in case you want to run mulitple machines in same data
 ){
   const machine = {
-    stateId: (id) ? id+'-state' : 'state',
-    data: data,
-    trigger(event, param){
-      const currentState =  definition[ data.get(machine.stateId) ]
+    trigger(str){ // AKA 'event'
+      // allows `event(param)` being passed as a string, not a function call
+      const { event, param } = str.match(/^(?<event>\w+)(?:\((?<param>[^)]+)\))?$/).groups
+      const currentState =  definition[ data.get(stateId) ]
       const targetState = currentState[event]
       let newState = ''
       switch (typeof targetState){
@@ -24,17 +24,20 @@ export default function createMachine(
         break
       }
       if (newState){
-        data.set(machine.stateId, newState)
-        definition[ data.get(machine.stateId) ]?._?.fnEnter?.() // does not re-turn if not enter3ed from outside state.
+        data.set(stateId, newState)
+        //TODO definition[ data.get(stateId) ]?._?.fnEnter?.() // does not re-turn if not enter3ed from outside state.
       }
       // no return; the data-state has your result, if you need it right away then use a signal library for `data`
     },
   }
   // init
-  data.set( machine.stateId, Object.keys(definition)[ (id) ? 1 : 0 ] ) // if id proved, then inital state must be 2nd
-  // return current
-  machine.getState = function(){ return data.get(machine.stateId) }
-  machine.getTriggers = function(){ return Object.keys( definition[ data.get(machine.stateId) ]) }
+  // if id is proved as part of the 'data' prameter, then initial state must be 2nd place in the `data` object
+  data.set( stateId, Object.keys(definition)[0] )
+
+  // return current FSM state
+  machine.getState = function(){ return data.get(stateId) }
+  // return available 'trigger' words for the current FSM state
+  machine.getTriggers = function(){ return Object.keys( definition[ data.get(stateId) ]) }
 
   return machine
 }
