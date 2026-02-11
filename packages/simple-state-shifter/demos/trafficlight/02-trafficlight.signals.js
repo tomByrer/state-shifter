@@ -6,9 +6,7 @@ const presets = [
   // ['isBlinking', false],  // 'broken', after lights reset & are 4-way blinking
 ]
 const data = new SignalMapish(presets)
-data.effect(() => { // trace all changes to state
-  console.info( '📝 state:', data.get('state') )
-});
+
 
 // Finite State Machine (FSM)
 const states ={
@@ -31,6 +29,11 @@ const states ={
 }
 const machine = createMachine(states, data)
 /*^ end finite state machine */
+
+// set up all data.effect after machine
+data.effect(() => {
+  console.info( '📝 state:', data.get('state') ) // trace all changes to state
+});
 
 /*^ begin demo tests*/
 console.log(`'machine' init using simple-state-shifter:`)

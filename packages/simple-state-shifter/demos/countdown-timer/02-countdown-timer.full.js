@@ -24,29 +24,13 @@ export const presets = [
   ['intervalID', ''],
   ['remainingSeconds', 0], // same as duration
 ]
-/*
-
-* state
-* effect(() => {
-*   console.log(`State is: ${count.get('state)}`);
-* }); // Console: State is: 1
-*/
-
 export const data = new SignalMapish(presets)
-// console.log('AS store:', data.store)
 
-const res = data.get('nothere')
-console.log(`data.get('nothere')`, res) // should return undefined
 
 // helper
 export function log(str='default log'){
   console.log(str)
 }
-
-data.effect(() => {
-  console.log( '⏰ ', data.get('remainingSeconds') );
-}); // Console: Count is: 1
-
 
 // as a convenance / convention, put all FuNctions for the FSM into an object
 const FN ={
@@ -122,6 +106,10 @@ export const states ={
 export const machine = createMachine(states, data)
 /*^ end finite state machine */
 
+// set up all data.effect after machine
+data.effect(() => {
+  console.log( '⏰ ', data.get('remainingSeconds') ); // trace all changes to remainingSeconds
+});
 
 /*^ begin demo tests */
 console.log(`'machine' init using simple-state-shifter:`)

@@ -167,9 +167,9 @@ export const states ={
 
 ## TODO
 
--[ ] explore to see if need state `onEnter` function again
--[ ] Mermaid.js to state
--[ ] deluxe-state-shifter
+- [ ] explore to see if need state `onEnter` function again
+- [ ] Mermaid.js to state
+- [ ] deluxe-state-shifter
 
 ## License
 
