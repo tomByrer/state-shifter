@@ -1,3 +1,4 @@
+// emulate HTML checkbox, using alien-signals as global state
 import createMachine from '../../simple-state-shifter'
 import SignalMapish from 'alien-signals-mapish'
 
