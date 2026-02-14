@@ -2,10 +2,7 @@
 // in text adventure game
 import createMachine from '../../simple-state-shifter'
 
-let number = 0
-
-
-// helper
+// helpers
 export function print(str='default log'){
   console.log(str)
 }
@@ -17,6 +14,7 @@ const context = {
   unlatched: false,
 }
 
+// FSM
 const states ={
   // first 'state' is always the initial/default
   room: {
@@ -33,7 +31,7 @@ const states ={
       if (Math.random() < context.oddsToFind){
         print(`🧱 You find a wall, with a faint light at the bottom of it about a meter wide...`)
         return 'wall'
-      } 
+      }
       else {
         print(`💥 On the way to the sound, you bump into what feels like office furniture.`)
         context.oddsToFind += context.oddsToFind // increase odds so we don't want to bump into things all day
