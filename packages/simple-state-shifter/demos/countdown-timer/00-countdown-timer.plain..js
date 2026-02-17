@@ -29,65 +29,65 @@ const data = new Map([['state', '']])
 
 class TimerStateMachine {
   constructor() {
-    data.set('state', 'setting') // inital state
+    data.set('state', 'setting') // initial state
   }
 
-trigger(event) {
-  switch (data.get('state')) {
+  trigger(event) {
+    switch (data.get('state')) {
 
-    case 'setting':
-      if (event === 'start') {
-        data.set('state', 'running')
-      }
-      break;
+      case 'setting':
+        if (event === 'start') {
+          data.set('state', 'running')
+        }
+        break;
 
-    case 'running':
-      if (event === 'delete') {
+      case 'running':
+        if (event === 'delete') {
+          data.set('state', 'setting')
+        } else if (event === 'expire') {
+          data.set('state', 'alarm')
+        } else if (event === 'pause') {
+          data.set('state', 'paused')
+        } else if (event === 'reset') {
+          data.set('state', 'standby')
+        }
+        break;
+
+      case 'paused':
+        if (event === 'delete') {
+          data.set('state', 'setting')
+        } else if (event === 'reset') {
+          data.set('state', 'standby')
+        } else if (event === 'resume') {
+          data.set('state', 'running')
+        }
+        break;
+
+      case 'alarm':
+        if (event === 'delete') {
+          data.set('state', 'setting')
+        } else if (event === 'reset') {
+          data.set('state', 'standby')
+        }
+        break;
+
+      case 'standby':
+        if (event === 'delete') {
+          data.set('state', 'setting')
+        } else if (event === 'start') {
+          data.set('state', 'running')
+        }
+        break;
+
+      default:
         data.set('state', 'setting')
-      } else if (event === 'expire') {
-        data.set('state', 'alarm')
-      } else if (event === 'pause') {
-        data.set('state', 'paused')
-      } else if (event === 'reset') {
-        data.set('state', 'standby')
-      }
-      break;
+        break;
+    }
 
-    case 'paused':
-      if (event === 'delete') {
-        data.set('state', 'setting')
-      } else if (event === 'reset') {
-        data.set('state', 'standby')
-      } else if (event === 'resume') {
-        data.set('state', 'running')
-      }
-      break;
-
-    case 'alarm':
-      if (event === 'delete') {
-        data.set('state', 'setting')
-      } else if (event === 'reset') {
-        data.set('state', 'standby')
-      }
-      break;
-
-    case 'standby':
-      if (event === 'delete') {
-        data.set('state', 'setting')
-      } else if (event === 'start') {
-        data.set('state', 'running')
-      }
-      break;
-
-    default:
-      data.set('state', 'setting')
-      break;
   }
-
-}
 
   get() {
-    return data.set('state')
+    return data.get('state')
   }
 }
 

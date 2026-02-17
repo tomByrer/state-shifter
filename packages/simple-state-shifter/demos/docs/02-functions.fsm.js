@@ -69,8 +69,10 @@ async function runDemo() {
   // state: middle
   logTrigger('info', `print, noop; should stay in middle`)
   logTrigger('add1', `+1 inline function`)
+  // two examples of a triggers that pass parameters
   logTrigger('addNumber(5)', `+5 with parameter`)
   logTrigger('subtractNumber(1)', `-1 outside function`)
+  
   logTrigger('nextGuard', `failed guard check`)
   logTrigger('addNumber(10)', `+10 with parameter`)
   logTrigger('nextGuard', `succeed guard check`)

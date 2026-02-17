@@ -31,7 +31,7 @@ export default function createMachine(
     },
   }
   // init
-  // if id is proved as part of the 'data' prameter, then initial state must be 2nd place in the `data` object
+  // if id is proved as part of the 'data' parameter, then initial state must be 2nd place in the `data` object
   data.set( stateId, Object.keys(definition)[0] )
 
   // return current FSM state
