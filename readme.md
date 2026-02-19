@@ -31,7 +31,7 @@ A client wants you to build a 'countdown timer' (sometimes found as Pomodoro tim
 - alarm (time expired)
 - standby (timer is reset to start)
 
-Not all of these modes are to be accessible to each other; only a few triggers will transition to another mode (AKA 'state').  So you produce this [lovely diagram](https://www.mermaidchart.com/play#pako:eNp9UDFuwzAM_ArhsYA-wCFTxk5Z6wysxdhCbcqQaCRB0L_Hoh3AaOBOIu94dyIfVRM9V1g552ppolxCi7UAaMcDI1xi4qwF6GP8QehI_DHRVQyie5wUwVObuBazyErKxzAjNJQZHxI3GqLA56n0Xx9ncO4AmVWDtAVaS4PTJFJqhNkoWfAL2qjQc8_Kf1nqKQ3ItzGkN26kKbNHe95cdd7q-47zqmyRy_BO4pb8R7gGFG4aTGjf2zHdcKtn1jjadZZ-R7dlX4nr5arfJxGwpRE):
+Not all of these modes are to be accessible to each other; only a few triggers will transition to another mode (AKA 'state').  So you produce this [lovely MermaidJS diagram](https://www.mermaidchart.com/play#pako:eNp9UDFuwzAM_ArhsYA-wCFTxk5Z6wysxdhCbcqQaCRB0L_Hoh3AaOBOIu94dyIfVRM9V1g552ppolxCi7UAaMcDI1xi4qwF6GP8QehI_DHRVQyie5wUwVObuBazyErKxzAjNJQZHxI3GqLA56n0Xx9ncO4AmVWDtAVaS4PTJFJqhNkoWfAL2qjQc8_Kf1nqKQ3ItzGkN26kKbNHe95cdd7q-47zqmyRy_BO4pb8R7gGFG4aTGjf2zHdcKtn1jjadZZ-R7dlX4nr5arfJxGwpRE):
 
 ```mermaid
 stateDiagram-v2
@@ -163,6 +163,26 @@ export const states ={
 #### Edit the states object
 
 * When you edit the states object that you fed to create the FSM (eg `let machine = createMachine(states, data)`), any changes you made will not happen unless you restart the FSM.
+
+
+## simple-state-shifter vs XState
+
+[XState](https://stately.ai/) is more powerful out-of-the-box than simple-state-shifter.  That extra power does come with a steeper learning curve, and uses more memory and CPU to run.
+
+|                 | XState | simple                                                        |
+|-----------------|--------|---------------------------------------------------------------|
+| main focus      | actors | finite state machines                                         |
+| package size    | ~100KB | <1KB                                                          |
+| features        | many   | very few; aims to be small, fast, & modular                   |
+| context         | yes    | solution: external or custom Map()-like data                  |
+| parallel states | yes    | solution: run multiple machines                               |
+| parent/child    | yes    | solution: flatten &/or run multiple machines                  |
+| initial state   | yes    | first state is always initial                                 |
+| final state tag | yes    | solution: define 'final' state sans transactions              |
+| actions         | yes    | solution: "inline function" instead of plain transition       |
+| guards          | yes    | solution: "inline function" conditionally returning new state |
+| state snapshots | yes    | no; but can build custom external function                    |
+| website         | great  | no; just GitHub README & examples                             |
 
 
 ## TODO

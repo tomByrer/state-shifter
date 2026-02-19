@@ -5,7 +5,6 @@ let states ={
   // first 'state' is always the initial/default
   red: {
     next: 'green',
-    
   },
   green: {
     next: 'yellow',
