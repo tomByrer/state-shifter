@@ -25,13 +25,12 @@ export default function createMachine(
       }
       if (newState){
         data.set(stateId, newState)
-        //TODO definition[ data.get(stateId) ]?._?.fnEnter?.() // does not re-turn if not enter3ed from outside state.
       }
       // no return; the data-state has your result, if you need it right away then use a signal library for `data`
     },
   }
   // init
-  // if id is proved as part of the 'data' parameter, then initial state must be 2nd place in the `data` object
+  // initial state must be 2nd place in the `data` object
   data.set( stateId, Object.keys(definition)[0] )
 
   // return current FSM state

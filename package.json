@@ -6,5 +6,6 @@
   ],
   "devDependencies": {
     "alien-signals-mapish": "github:tomByrer/alien-signals-mapish",
+    "alien-signals": "^3.1.2"
   }
 }

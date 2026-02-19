@@ -2,14 +2,16 @@
 import createMachine from '../../simple-state-shifter'
 import SignalMapish from './alien-signals-mapish'
 
+// import { machine } from './counter-260217.00'
 // signal data
 const presets = [
   ['state', ''], // FSM main state
   // contexts are below, so now instead of `context.count` we'll `data.count`
   ['count', 0],
   ['usedCount', 0], // flagged when count has been touched
+  ['_', 'id=counter-260217.00']  // information
 ]
-const data = new SignalMapish(presets)
+let data = new SignalMapish(presets)
 // console.log(data)
 
 // helpers
@@ -19,8 +21,10 @@ export function print(str='default log'){
 
 // functions for states
 function addCount(input){
-  data.set('count', data.get('count') + input)
-  data.set('usedCount', data.get('usedCount') + 1) // logging count usage
+  data.queueUpdates() // pause signal updates
+    data.set('count', data.get('count') + input)
+    data.set('usedCount', data.get('usedCount') + 1) // logging count usage\
+  data.resumeUpdates() // now do all signal updates at once
 }
 
 data.effect(() => {
@@ -40,7 +44,7 @@ function guardTry(){
 }
 
 // FSM
-const states ={
+export const states ={
   // first 'state' is always the initial/default
   start: {
     next: 'middle',
@@ -67,11 +71,12 @@ const states ={
   },
 }
 
-const machine = createMachine(states, data)
+export let machine = createMachine(states, data)
+
 /*^ end finite state machine */
 
-
 /*^ begin demo tests*/
+// console.warn('snapshot', data.getSnapshot())
 function currentStatus(){
   console.log(`  state >`, machine.getState(),
     `<
@@ -79,9 +84,7 @@ with triggers:`, machine.getTriggers()
   )
 }
 function logTrigger(trigger, note){
-  console.log(`
-machine.trigger('${trigger}') // ${note}
-`)
+  console.log(`machine.trigger('${trigger}') // ${note}`)
   machine.trigger(trigger)
   currentStatus()
 }
@@ -106,4 +109,36 @@ async function runDemo() {
   logTrigger('finish', `start --> end`)
 }
 runDemo()
+console.log('_main demo', machine)
+
+/*
+  test renewing machine from snapshot
+*/ 
+export const usedSnapshot = data.getSnapshot()
+machine = ""
+console.log(`
+  after resets: machine:`, machine)
+data = ""
+console.log('  after resets: data:', data)
+console.log(`now restart using snapshot
+`)
+
+data = new SignalMapish(usedSnapshot)
+data.effect(() => {
+  print(`🧮 count is now: ${data.get('count')} usedCount: ${data.get('usedCount')}`)
+})
+machine = createMachine(states, data)
+currentStatus()
+async function runDemoPostSnapshot() {
+  logTrigger('info', `doesn't exist; should be in end`)
+  logTrigger('restart', `end --> start`)
+  logTrigger('next', `start --> middle`)
+  // state: middle
+  logTrigger('add1', `+ 1 to count, inc counter counter`)
+  // two examples of a triggers that pass parameters
+  logTrigger('addNumber(3)', `+3 with parameter`)
+  logTrigger('subtractNumber(2)', `-2 with parameter`)
+}
+runDemoPostSnapshot()
+
 /*^ end demo */
