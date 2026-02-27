@@ -1,6 +1,6 @@
 // basics simple-state-shifter FSM
 import createMachine from '../../simple-state-shifter'
-import SignalMapish from './alien-signals-mapish'
+import SignalMapish from 'alien-signals-mapish'
 
 // import { machine } from './counter-260217.00'
 // signal data

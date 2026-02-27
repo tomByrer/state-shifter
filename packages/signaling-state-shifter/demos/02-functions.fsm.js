@@ -1,13 +1,15 @@
 // using simple-state-shifter FSM with functions
-import createMachine from '../signaling-simple-state-shifter'
+import createMachine from '../signaling-state-shifter'
 
-// helpers
+// helper
 export function print(str='default log'){
   console.log(str)
 }
+// NOT best pratise: we'll fake an external context/ctx
 const context = {
   count: 0,
 }
+// external fn for states
 function subtract(num=0){
   context.count -= num
 }
@@ -45,7 +47,8 @@ const states ={
   },
 }
 
-const machine = createMachine(states)
+const {machine} = createMachine( { meta:{id:'maths',ver:'1.0.260226'},states:states} )
+console.log('machine', machine,)
 /*^ end finite state machine */
 
 /*^ begin demo tests*/

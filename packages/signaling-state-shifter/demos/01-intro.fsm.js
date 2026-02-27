@@ -1,5 +1,5 @@
 // basics simple-state-shifter FSM
-import createMachine from '../signaling-simple-state-shifter'
+import createMachine from '../signaling-state-shifter'
 
 // FSM
 const states ={
@@ -17,7 +17,7 @@ const states ={
   },
 }
 
-const machine = createMachine(states)
+const {machine} = createMachine( { meta:{id:'intro',ver:'1.0.260226'},states:states} )
 /*^ end finite state machine */
 
 /*^ begin demo tests*/

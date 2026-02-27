@@ -1,0 +1,9 @@
+{
+  "name": "signaling-state-shifter",
+  "main": "signaling-state-shifter.js",
+  "version": "1.2.0",
+  "description": "Finite State Machine (FSM) using alien-signals",
+  "scripts": {
+    "demo": "bun run ./demos/03-dual.ts"
+  }
+}

@@ -15,7 +15,7 @@ stateDiagram
   standby --> setting:delete
   standby --> running:start
 */
-import createMachine from 'simple-state-shifter'
+import createMachine from '../../simple-state-shifter'
 
 export const states ={
   setting: {  // 1st screen, no timer set

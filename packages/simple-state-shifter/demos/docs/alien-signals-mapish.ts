@@ -1,3 +1,4 @@
+// wrapper derived from https://github.com/johnsoncodehk/alien-signals-starter
 import { createReactiveSystem, Link, ReactiveNode, ReactiveFlags } from 'alien-signals/system';
 
 const {
@@ -7,10 +8,10 @@ const {
   checkDirty,
   shallowPropagate,
 } = createReactiveSystem({
-  update(signal: Computed | Signal) {
+  update(signal: any) {
     return signal.update();
   },
-  notify(effect: Effect) {
+  notify(effect: any) {
     queue.push(effect);
   },
   unwatched() { },
@@ -21,40 +22,6 @@ let batchDepth = 0;
 let activeSub: ReactiveNode | undefined;
 
 const queue: Effect[] = [];
-
-// export function signal<T>(): Signal<T | undefined>;
-// export function signal<T>(oldValue: T): Signal<T>;
-// export function signal<T>(oldValue?: T): Signal<T | undefined> {
-//   return new Signal(oldValue);
-// }
-
-// export function computed<T>(getter: () => T): Computed<T> {
-//   return new Computed<T>(getter);
-// }
-
-// export function effect<T>(fn: () => T): Effect<T> {
-//   const e = new Effect(fn);
-//   e.run();
-//   return e;
-// }
-
-// // https://github.com/stackblitz/alien-signals/issues/62
-// // queue pause signal updates
-// export function startBatch() {
-//   ++batchDepth;
-// }
-// // resume queued updates from pause
-// export function endBatch() {
-//   if (--batchDepth === 0) {
-//     flush();
-//   }
-// }
-
-function flush() {
-  while (queue.length > 0) {
-    queue.shift()!.run();
-  }
-}
 
 function shouldUpdate(sub: ReactiveNode): boolean {
   const flags = sub.flags;
@@ -102,66 +69,16 @@ class Signal<T = any> implements ReactiveNode {
       propagate(subs);
       if (batchDepth <= 0) {
         // flush()
-        while (queue.length > 0){ queue.shift()!.run() }
+        while (queue.length > 0) { queue.shift()!.run() }
       }
     }
   }
-
-  // add(delta: string | number): void {
-  // 	const current = this.value as any;
-  // 	const newValue = current + delta;
-  // 	this.set(newValue as T);
-  // }
 
   update() {
     this.flags = ReactiveFlags.Mutable;
     return this.value !== (this.value = this.pendingValue);
   }
 }
-
-// class Computed<T = any> implements ReactiveNode {
-//   value: T | undefined = undefined;
-//   subs: Link | undefined = undefined;
-//   subsTail: Link | undefined = undefined;
-//   deps: Link | undefined = undefined;
-//   depsTail: Link | undefined = undefined;
-//   flags: ReactiveFlags = ReactiveFlags.Mutable | ReactiveFlags.Dirty;
-
-//   constructor(
-//     public getter: () => T
-//   ) { }
-
-//   get(): T {
-//     if (shouldUpdate(this) && this.update()) {
-//       const subs = this.subs;
-//       if (subs !== undefined) {
-//         shallowPropagate(subs);
-//       }
-//     }
-//     if (activeSub !== undefined) {
-//       link(this, activeSub, cycle);
-//     }
-//     return this.value!;
-//   }
-
-//   update(): boolean {
-//     ++cycle;
-//     this.depsTail = undefined;
-//     this.flags = ReactiveFlags.Mutable | ReactiveFlags.RecursedCheck;
-//     const prevSub = activeSub;
-//     activeSub = this;
-//     try {
-//       return this.value !== (this.value = this.getter());
-//     } finally {
-//       activeSub = prevSub;
-//       this.flags &= ~ReactiveFlags.RecursedCheck;
-//       let toRemove = this.depsTail !== undefined ? (this.depsTail as Link).nextDep : this.deps;
-//       while (toRemove !== undefined) {
-//         toRemove = unlink(toRemove, this);
-//       }
-//     }
-//   }
-// }
 
 class Effect<T = any> implements ReactiveNode {
   deps: Link | undefined = undefined;
@@ -189,26 +106,16 @@ class Effect<T = any> implements ReactiveNode {
       }
     }
   }
-
-  // stop(): void {
-  //   let dep = this.deps;
-  //   while (dep !== undefined) {
-  //     dep = unlink(dep, this);
-  //   }
-  // }
 }
 
-
-// (c)2026 Tom Byrer
-// import { effect as ASeffect, signal } from './alien-signals-getset'
-
-type Signal<T> = { get(): T; set(value: T): void }
-type StoreKey = any //FIXME Matches JS Map key flexibility (any value)
-type StoreValue<T = unknown> = Signal<T>
+// below code is alien-signals-mapish (c)2026 Tom Byrer
+// Enforce string keys to prevent the "number turns into string" snapshot bug
+type StoreKey = string; 
+type StoreValue<T = unknown> = Signal<T>;
 
 export default class SignalMapish<T = unknown> {
-  private store: Record<StoreKey, StoreValue<T>> = {}
-
+  // pure dictionary with NO prototype chain (maximum speed, zero bugs)
+  private store: Record<StoreKey, StoreValue<T>> = Object.create(null);
   constructor(presets: [StoreKey, T][]) {
     const len = presets.length
     for (let i = 0; i < len; i++) {
@@ -224,39 +131,48 @@ export default class SignalMapish<T = unknown> {
   }
 
   has(key: StoreKey): boolean {
-    return key in this.store
+    // speed over preventing footguns
+    return this.store[key] !== undefined
   }
 
   get(key: StoreKey): T | undefined {
-    return this.has(key) ? this.store[key].get() : undefined
+    //  Fast lookup
+    return this.store[key]?.get()
   }
 
   set(key: StoreKey, value: T): void {
-    const storedSignal = this.store[key]
-    if (storedSignal && typeof storedSignal.set === 'function') {
-      storedSignal.set(value)
+    // Safe update
+    this.store[key]?.set(value)
+  }
+
+  // exporting current state as 'presets' 
+  getSnapshot(): Array<[StoreKey, T]> {
+    // assume Object.keys returns strings
+    return Object.keys(this.store).map(key => [
+      key, 
+      this.store[key].get() as T
+    ])
+  }
+
+  // merge only if NOT new; no overwrites of keys or values
+  // you can use the result of getSnapshot() to merge in missing key/values
+  mergePresets(presets: [StoreKey, T][]) {
+    const len = presets.length
+    for (let i = 0; i < len; i++) {
+      const [key, value] = presets[i]
+      if (!this.has(key)) {
+        this.store[key] = new Signal(value)
+      }
     }
   }
 
-  getSnapshot(): Array<Array<T>> {
-    return Object.keys(this.store).map(key => [key, this.store[key].get()])
-  }
-
-  // pause signal updates
-  queueUpdates(){ ++batchDepth }
+  // https://github.com/stackblitz/alien-signals/issues/62
+  // pause signal updates; use when you want to batch several updates as one
+  queueUpdates() { ++batchDepth }
   // resume queued updates from pause
-  resumeUpdates(){
+  resumeUpdates() {
     if (--batchDepth <= 0){ /*flush()*/
       while (queue.length > 0){ queue.shift()!.run() }
     }
   }
-
-
-  // add(key: StoreKey, value: string | number): void {
-  //   const storedSignal = this.store[key]
-  //   if (storedSignal && typeof storedSignal.set === 'function') {
-  //     const currentValue = storedSignal.get()
-  //     storedSignal.set((currentValue as any) + value)
-  //   }
-  // }
 }
