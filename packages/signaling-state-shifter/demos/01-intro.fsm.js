@@ -9,7 +9,7 @@ const states ={
     finish: 'end',
   },
   middle: {
-    info: '', // if noop, just make the value/'event' to be an empty string
+    info: 'middle', // if noop, just make the value/'event' to be an empty string
     next: 'end',
   },
   end: {

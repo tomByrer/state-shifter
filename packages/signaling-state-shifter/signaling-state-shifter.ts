@@ -1,4 +1,5 @@
-// using simple-state-shifter FSM with functions
+// v2.0.20260227 @2026 TomByrer 
+// FSM with functions and alien-signals
 import SignalMapish from 'alien-signals-mapish' 
 
 // here we use SignalMapish; has get() & set() API like Map() along with merge & snapshot helpers
@@ -58,11 +59,11 @@ export default function createMachine(
 
   const machine = {
     trigger(str: string) {
-      const match = str.match(/^(?<event>\w+)(?:\((?<param>[^)]+)\))?$/);
-      if (!match || !match.groups) return;
-      
-      const { event, param } = match.groups
-      
+      const reParam = /^(?<name>\w+)(?:\((?<param>[^)]*)\))?$/;
+      const match = str.match(reParam)
+      if (!match?.groups) return
+      const { name:event, param:triggerParam } = match.groups
+
       const currentStateName = ctx.get(stateKey) as string
       const currentState = DEF.states[currentStateName]
       if (!currentState) return;
@@ -72,20 +73,39 @@ export default function createMachine(
 
       switch (typeof targetState) {
         case 'string':
-          newState = targetState;
-          break;
+          const targetMatch = targetState.match(reParam)
+          console.log('str', targetMatch?.groups)
+          if (!targetMatch?.groups) {
+            throw new Error('Invalid targetState format');
+          }
+          let { name, param } = targetMatch?.groups
+          switch (param) {
+            case undefined: // targetState === 'plain string' (no parentheses)
+              newState = name;
+              break;
+            case '': // targetState === 'emptyFn()' (empty parentheses)
+  {           const returned = DEF.fn[name]()
+            if (returned !== undefined) { newState = returned }
+            break;}
+            default: // targetState === 'fnParam("test")' (has content)
+              param = (param === "param") ? triggerParam : param
+  {           const returned = DEF.fn[name](param)
+              if (returned !== undefined) { newState = returned }
+              break;}
+          }
+            break;
         case 'function':
-          const returned = targetState(fsmContext, param)
+          const returned = targetState(fsmContext, triggerParam)
           if (returned !== undefined) { newState = returned }
           break
       }
       if (DEF.states[newState]) { // check if newState is valid
         if (currentState.onExit){
-          currentState.onExit(fsmContext, param)
+          currentState.onExit(fsmContext, triggerParam)
         }
         ctx.set(stateKey, newState)
         if (DEF.states[newState].onEnter){
-          DEF.states[newState].onEnter(fsmContext, param)
+          DEF.states[newState].onEnter(fsmContext, triggerParam)
         }
       }
       else if (newState !== ''){
