@@ -1,5 +1,4 @@
-// v2.0.20260227 @2026 TomByrer 
-// FSM with functions and alien-signals
+// signaling-state-shifter v2.1.260311 @2026 TomByrer
 import SignalMapish from 'alien-signals-mapish' 
 
 // here we use SignalMapish; has get() & set() API like Map() along with merge & snapshot helpers
@@ -31,104 +30,98 @@ export interface MachineSnapshot {
   meta: Record<string, any>;
   ctx: Array<[StoreKey, any]>;
 }
-export interface FSMContext {
-  ctx: SignalMapish<any>;
-  fn: Record<string, any>;
-  machine: {
-    trigger(str: string): void;
-    getState(): string;
-    getTriggers(): string[];
-    getSnapshot(): MachineSnapshot;
-  };
-}
 export default function createMachine(
   DEF: any,
   stateKey: string =  DEF.meta.id + 'State',
   merge: any = false, // pass the Map (or Mapish) you want to merge
 ){
   const ctx: any = createMaps(DEF, stateKey, merge)
-  const fsmContext: FSMContext = { ctx, fn: {}, machine: null as any }
-
+  const fsmFn: Record<string, any> = {}
   if (DEF.fn) {
     for (const key in DEF.fn) {
       if (typeof DEF.fn[key] === 'function') {
-        fsmContext.fn[key] = (...args: any[]) => DEF.fn[key](fsmContext, ...args)
+        fsmFn[key] = (...args: any[]) => DEF.fn[key](ctx, ...args)  //FIXME xtx & fn
       }
     }
   }
 
+  function funcTarget(targetState: string, param: string){ // returns newStateName
+    const matchTarget = targetState.match(/^(?<targetName>\w+)(?:\((?<targetParam>.*)\))?$/)
+    if (!matchTarget){
+      console.warn(`❗Malformed target`) // usually invalid character, but we don't want to log targetState; might be exploit
+      return //nothing
+    }
+    const { targetName, targetParam } = matchTarget.groups
+    switch (targetParam){
+
+      case undefined: // no function
+        return targetState
+        break;
+
+      case '': // function, no parameters
+        return fsmFn[targetName](param)
+        break;
+        
+      default: // has targetParam
+        // Strip quotes if present
+        let processedParam = targetParam
+          .replace(/^['"`](.*)['"`]$/, '$1') // remove outer quotes
+          .replaceAll('$param', param) // replace from trigger parameter
+        return fsmFn[targetName](processedParam)  // FIXED
+        break;
+    }//switch
+  };
+
   const machine = {
     trigger(str: string) {
-      const reParam = /^(?<name>\w+)(?:\((?<param>[^)]*)\))?$/;
-      const match = str.match(reParam)
-      if (!match?.groups) return
-      const { name:event, param:triggerParam } = match.groups
-
+      const match = str.match(/^(?<event>\w+)(?:\((?<param>.*)\))?$/)
+      if (!match || !match.groups) return;
+      
+      const { event, param } = match.groups
+      
       const currentStateName = ctx.get(stateKey) as string
       const currentState = DEF.states[currentStateName]
-      if (!currentState) return;
-      
-      const targetState = currentState[event];
-      let newState = '';
+      if (!currentState) return
+      const targetState = currentState[event]
+      if (!targetState){
+        console.warn(`❗Invalid trigger/target "${event}" in current "${currentStateName}"`)
+        return //nothing
+      }
 
-      switch (typeof targetState) {
-        case 'string':
-          const targetMatch = targetState.match(reParam)
-          console.log('str', targetMatch?.groups)
-          if (!targetMatch?.groups) {
-            throw new Error('Invalid targetState format');
-          }
-          let { name, param } = targetMatch?.groups
-          switch (param) {
-            case undefined: // targetState === 'plain string' (no parentheses)
-              newState = name;
-              break;
-            case '': // targetState === 'emptyFn()' (empty parentheses)
-  {           const returned = DEF.fn[name]()
-            if (returned !== undefined) { newState = returned }
-            break;}
-            default: // targetState === 'fnParam("test")' (has content)
-              param = (param === "param") ? triggerParam : param
-  {           const returned = DEF.fn[name](param)
-              if (returned !== undefined) { newState = returned }
-              break;}
-          }
-            break;
-        case 'function':
-          const returned = targetState(fsmContext, triggerParam)
-          if (returned !== undefined) { newState = returned }
-          break
+      const newStateName = funcTarget(targetState, param)
+      if (newStateName === undefined) return;  // noop; likely "targetless transition"
+      if (newStateName === currentStateName){  // don't allow reentry triggers
+        console.warn(`❗Prevented attempt to retrigger "${currentStateName}"`)
+        return
       }
-      if (DEF.states[newState]) { // check if newState is valid
-        if (currentState.onExit){
-          currentState.onExit(fsmContext, triggerParam)
-        }
-        ctx.set(stateKey, newState)
-        if (DEF.states[newState].onEnter){
-          DEF.states[newState].onEnter(fsmContext, triggerParam)
-        }
+      const newStateObj = DEF.states[newStateName]
+      if (!newStateObj){ // check if newStateName is valid
+        console.warn(`❗Invalid attempt for newState "${newStateName}" in current "${currentStateName}"`)
+        return
       }
-      else if (newState !== ''){
-        console.warn(`❗Invalid attempt for newState "${newState}" in current "${currentStateName}"`)
+      // transition state
+      if (currentState.onExit){
+        funcTarget(currentState.onExit, param)
+      }
+      ctx.set(stateKey, newStateName)
+      if (newStateObj.onEnter){
+        funcTarget(newStateObj.onEnter, param)
       }
     },
     getState() { 
-      return ctx.get(stateKey) as string;
+      return ctx.get(stateKey) as string
     },
     getTriggers() { 
-      const currentStateName = ctx.get(stateKey) as string;
-      return Object.keys(DEF.states[currentStateName] || {}); 
+      const currentStateName = ctx.get(stateKey) as string
+      return Object.keys(DEF.states[currentStateName] || {})
     },
     getSnapshot(): MachineSnapshot {
       return {
         meta: { ...DEF.meta, snapped: Date.now() },
         ctx: ctx.getSnapshot()
-      };
+      }
     }
   };
-
-  fsmContext.machine = machine;
-
   return { machine, ctx }
 }
 
@@ -136,8 +129,9 @@ export default function createMachine(
 export function resumeMachine(
   definition: any, // source 
   snapshot: MachineSnapshot, // merging in
-  ifFailDefinitionFallback: boolean = true // use definition context defaults if snapshot versions do not match
+  ifFailDefinitionFallback: boolean = false // use definition context defaults if snapshot versions do not match
 ){
+  // happy-path
   if (
     definition.meta.id === snapshot.meta.id && 
     definition.meta.ver === snapshot.meta.ver
@@ -145,18 +139,14 @@ export function resumeMachine(
     let mergedDef = definition
     mergedDef.ctx = [...snapshot.ctx]
     mergedDef.meta = {...definition.meta, ...snapshot.meta}    
-
     return createMachine(mergedDef)
-  } else {
-    if (ifFailDefinitionFallback){
-      // Mismatch fallback
-      definition.meta.err = `${snapshot.meta.snapped} update failed`
-      console.warn(`${snapshot.meta.snapped} snapshot merge failed (id or version mismatch).\nFallback to definition ${definition.meta.id} ver ${definition.meta.ver}.`)
-    } else {
-      console.warn(`${snapshot.meta.snapped} snapshot merge FAILED (id or version mismatch).`)
-      return null 
-    }
-
-    return createMachine(definition)
   }
+
+  if (!ifFailDefinitionFallback){
+    throw new Error(`${snapshot.meta.snapped} snapshot merge hard FAILED (id or version mismatch).`)
+  }
+  // Mismatch fallback to restart machine with defaults
+  definition.meta.err = `${snapshot.meta.snapped} update failed`
+  console.warn(`${snapshot.meta.snapped} snapshot merge failed (id or version mismatch).\nFallback to definition ${definition.meta.id} ver ${definition.meta.ver}.`)
+  return createMachine(definition)
 }
