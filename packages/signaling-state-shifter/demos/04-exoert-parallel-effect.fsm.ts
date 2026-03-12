@@ -7,25 +7,21 @@ const trafficlightDef = {
     ver: "1.2.20260307",
   },
   ctx: [
-    ['checkRedCount', 0],
+    ['checkGreenCount', 0],
   ],
   fn: {
     print: (ctx: any, str = 'default log')=>{
       console.log(str)
     },
-    checkRedOnEnter: (ctx: any)=>{
-      ctx.set('checkRedCount', ctx.get('checkRedCount')+1)
-      const state_crosswalk = ctx.get('crosswalkState')
-      if (state_crosswalk === 'wait') {
-        return 'green'
-      } else {
-        console.log(`❗Waiting on crosswalk, now at: ${state_crosswalk}`)
-      }
-    },
-    checkRedNext: (ctx: any)=>{
+    // GUARD
+    // best practice function format:
+    // name: start with `if` then what is tested abbreviated, `_goto`
+    // then pass the target iv valid 
+    ifCwDont_goto: (ctx: any, target='green')=>{
+      ctx.set('checkGreenCount', ctx.get('checkGreenCount')+1)
       const state_crosswalk = ctx.get('crosswalkState')
       if (state_crosswalk === 'dont') {
-        return 'green'
+        return target
       } else {
         console.log(`❗Waiting on crosswalk, now at: ${state_crosswalk}`)
       }
@@ -39,8 +35,7 @@ const trafficlightDef = {
       onExit: "print('🛠️ outage fixed.')",
     },
     red: {
-      onEnter: "checkRedOnEnter()",
-      next: "checkRedNext()",
+      next: "ifCwDont_goto('green')",
       error: "outage",
     },
     green: {
@@ -68,13 +63,17 @@ const crosswalkDef = {
     ['checkPressButtonCount', 0],
   ],
   fn: {
-    onRestart: (ctx: any)=>{
-      
-    },
     print: (ctx: any, str = 'default log')=>{
       console.log(str)
     },
-    checkPressButton: (ctx: any)=>{
+    printWaitStatus: (ctx: any)=>{
+      console.log(`✋ Crosswalk waiting for trafficlight, now at: ${ctx.get('trafficlightState')}`)
+    },
+    // GUARDS
+    // best practice function format:
+    // name: start with `if` then what is tested abbreviated, `_goto`
+    // then pass the target iv valid or in function name
+    ifTlRed_WalkElseWait: (ctx: any)=>{
       ctx.set('checkPressButtonCount', ctx.get('checkPressButtonCount')+1)
       const state_trafficlight = ctx.get('trafficlightState')
       if (state_trafficlight === 'red'){
@@ -84,37 +83,32 @@ const crosswalkDef = {
         return 'wait'
       }
     },
-    printWaitStatus: (ctx: any)=>{
-      console.log(`✋Crosswalk waiting for trafficlight, now at: ${ctx.get('trafficlightState')}`)
-    },
-    checkWaitNext: (ctx: any, msg: string)=>{
-      console.log(msg)
-      const state_trafficlight = ctx.get('trafficlightState');
-      console.log('TL in wait', state_trafficlight)
+    ifTlRed_goto: (ctx: any, target='walk')=>{
+      const state_trafficlight = ctx.get('trafficlightState')
       if (state_trafficlight === 'red') {
-        return 'walk'
+        return target
       } else {
-        console.log(`✋Waiting on trafficlight, now at: ${state_trafficlight}`)
+        console.log(`✋ Waiting on trafficlight, now at: ${state_trafficlight}`)
       }
     },
   },
   states: {
     outage: {
       onEnter: "print('🕵️‍♀️ oh-oh, outage!  Blinking red 4-way!')",
-      next: "print('🔴Light is broken, blinking \\'Don\\'t Walk\\', waiting for [fix].')",
-      pressButton: "print('🚷Light is broken, blinking \\'Don\\'t Walk\\', waiting for [fix].')",
+      next: "print('🔴 Light is broken, blinking \\'Don\\'t Walk\\', waiting for [fix].')",
+      pressButton: "print('🚷 Light is broken, blinking \\'Don\\'t Walk\\', waiting for [fix].')",
       fix: "dont",
     },
     dont: {
       onEnter: "print('🚷 Don\\'t cross.')",
-      pressButton: "checkPressButton()",
+      pressButton: "ifTlRed_WalkElseWait()",
       error: "outage",
       onExit: "print('🕵️‍♀️ exiting dont.')",
     },
     wait: {
       onEnter: "printWaitStatus()",
-      next: "checkWaitNext('trigger~next')",
-      autorun: "checkWaitNext('trigger~autorun')",
+      next: "ifTlRed_goto('walk')",
+      autorun: "ifTlRed_goto('walk')",
       error: "outage",
     },
     walk: {
@@ -137,7 +131,7 @@ let { machine: cwMachine} = createMachine(crosswalkDef, cwStateName, masterState
 // https://github.com/stackblitz/alien-signals?tab=readme-ov-file#basic-apis
 masterStates.effect(()=>{
   if ( cwMachine.getState(cwStateName) === 'wait' ){ cwMachine.trigger('autorun') }
-  console.log('effect: red light count =', masterStates.get('checkRedCount'),
+  console.log('effect: checkGreenCount =', masterStates.get('checkGreenCount'),
   ' walk button presses =', masterStates.get('checkPressButtonCount'))
 })
 
@@ -152,6 +146,7 @@ function currentStatus(){
 function tlLogTrigger(trigger: string, note: string) {
   console.log(`\ntlMachine.trigger('${trigger}') // ${note}`);
   tlMachine.trigger(trigger)
+  currentStatus();
 }
 function crosswalkLogTrigger(trigger: string, note: string) {
   console.log(`\ncwMachine.trigger('${trigger}') // ${note}`);
